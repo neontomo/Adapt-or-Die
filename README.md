@@ -1,4 +1,4 @@
-# adapt-or-die
+# Adapt or Die
 In this episode of Adapt or Die, we build a game where AI organisms fight to survive against the harsh realities of nature.
 
 A playable version is available at [https://neontomo.com/play/adapt-or-die](https://neontomo.com/play/adapt-or-die)
