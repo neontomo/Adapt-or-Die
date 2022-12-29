@@ -1,0 +1,68 @@
+/* GENERAL ELEMENTS */
+
+:root {
+	--green: #0be881;
+	--red: #ff3f34;
+}
+* {
+	padding: 0;
+	margin: 0;
+	font-size: 14px;
+	font-family: arial;
+	user-select: none;
+}
+body, html {
+	height: 100%;
+	overflow: hidden;
+}
+main {
+	width: 100vw;
+	height: 100vh;
+	position: fixed;
+	top: 0;
+	left: 0;
+	box-sizing: border-box;
+	background: #000;
+	margin: 0 auto;
+}
+#collider {
+	background: var(--green);
+	opacity: 0.7;
+	position: fixed;
+	cursor: pointer;
+	width: 200px;
+	height: 200px;
+}
+#timer {
+	color: #fff;
+	position: fixed;
+	right: 0;
+	top: 0;
+	z-index: 5;
+	padding: 30px;
+	font-size: 80px;
+	font-weight: bold;
+	width: 100px;
+}
+.dot {
+	height: 13px;
+	width: 13px;
+	background: #fff;
+	position: fixed;
+	box-sizing: border-box;
+}
+.dot[seeNames="true"]::after {
+	content: attr(name);
+	font-size: 12px;
+	color: #fff;
+	display: block;
+	padding-top: 18px;
+	margin-left: -15px;
+}
+
+@media (max-width: 700px)  {
+	/* Outline doesn't work on mobile unfortunately... */
+	.dot {
+		outline: none !important;
+	}
+}
