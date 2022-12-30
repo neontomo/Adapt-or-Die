@@ -131,6 +131,7 @@ function killDots() {
 		
 		if ($('#collider').collision($('.dot[name="' + dotName + '"]')).length == 0) { // extinct
 			findMutation(dotName).alive = false;
+			mutationsList = mutationsList.filter(item => item.alive !== false);
 		}
 		if ($('#collider').collision(this).length == 0) { // dead
 			$(this).remove();
