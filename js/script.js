@@ -2,8 +2,6 @@
 
 windowWidth = $(window).width();
 windowHeight = $(window).height();
-mainLeft = $('main').offset().left;
-mainTop = $('main').offset().top;
 mainWidth = $('main').outerWidth();
 mainHeight = $('main').outerHeight();
 gameRunning = true;
@@ -12,19 +10,23 @@ timer = 10;
 activeTimer = timer;
 namesEnabled = true;
 
-mutations = [
+var mutationsList = [
 	{
-		name: 'god', /* Initial seed. I'm not religious I swear */
-		S: 2,
-		D: 0.1,
-		R: 0.2,
-		Dir: '0123',
-		background: randomColor(),
-		border: randomNumber('int', 0, 6) + 'px solid ' + randomColor(),
-		outline: randomNumber('int', 0, 5) + 'px solid ' + randomColor(),
-		borderRadius: [randomNumber('int', 0, 30), randomNumber('int', 0, 30), randomNumber('int', 0, 30), randomNumber('int', 0, 30)].join('px ') + 'px'
+		name: 'god',
+		speed: 1,
+		mutationRate: 0.3,
+		alive: true,
+		innerColor: randomColor(),
+		borderColor: randomColor(),
+		outlineColor: randomColor(),
+		borderRadius: randomBorderRadius(),
+		directions: '0123'
 	}
 ];
+
+function findMutation(name) {
+	return mutationsList.find(mutationsList => mutationsList.name === name);
+}
 
 /* RANDOM */
 
@@ -35,6 +37,10 @@ function randomNumber(type, min, max, not) {
 	} else {
 		return not == r ? randomNumber(type, min, max, not) : r;
 	}
+}
+
+function probability(decimal) {
+	return !!decimal && Math.random() <= decimal;
 }
 
 function randomColor() {
@@ -87,38 +93,53 @@ function moveDot(dot, direction) {
 
 function animateDots() {
 	if (gameRunning == false) return;
-	
-	$('.dot').each(function () {
-		var direction = $(this).attr('Dir').split('');
-		direction = direction[randomNumber('int', 0, direction.length - 1)];
-		moveDot($(this), direction);
-	});
+	for (var i = 0; i < mutationsList.length; i++) {
+		if (mutationsList[i].alive == true) {
+			$('.dot[name="' + mutationsList[i].name + '"]').each(function () {
+				var directions = mutationsList[i].directions;
+				var direction = directions[randomNumber('int', 0, directions.length - 1)];
+				moveDot($(this), direction, mutationsList[i].speed);
+			});
+		}
+	}
 }
 
 /* KILL & REWARD */
 
 function killDots() {
 	$('.dot').each(function () {		
-		if ($('#collider').collision(this).length == 0) {
+		var dotName = $(this).attr('name');
+		
+		if ($('#collider').collision($('.dot[name="' + dotName + '"]')).length == 0) { // extinct
+			for (var i = 0; i < mutationsList.length; i++) {
+				if (mutationsList[i].name == dotName) {
+					mutationsList[i].alive = false;
+				}
+			}
+		}
+		if ($('#collider').collision(this).length == 0) { // dead
 			$(this).remove();
 		}
 	});
 }
 
 function rewardDots() {
-	for (var i = 0; i < mutations.length; i++) {
-		$('.dot[name="' + mutations[i].name + '"]').each(function () {
-			var positions = [mainLeft + (mainWidth / 2), mainTop + (mainHeight / 2)];
-			$(this).css({ left: positions[0], top: positions[1] });
-			
-			if (randomNumber('int', 1, 3) == 1) {
-				// 1 in 3 chance of mutation
-				mutate(mutations[i]);
-			} else {
-				// 2 in 3 chance of carbon copy
-				spawnDot(mutations[i]);
-			}
-		});
+	$('.dot').css({ left: mainWidth / 2, top: mainHeight / 2 });
+	
+	for (var i = 0; i < mutationsList.length; i++) {
+		if (mutationsList[i].alive == true) {
+			$('.dot[name="' + mutationsList[i].name + '"]').each(function () {
+				var dotName = $(this).attr('name');
+				var mutationRate = mutationsList[i].mutationRate;
+				if (randomNumber('dec', mutationRate, 1) == mutationRate) {
+					// Chance of mutation
+					mutate(mutationsList[i]);
+				} else {
+					// Chance of carbon copy
+					spawnDot(mutationsList[i]);
+				}
+			});
+		}
 	}
 }
 
@@ -139,57 +160,59 @@ function updateTimer() {
 
 /* SPAWNING & MUTATING */
 
-function spawnDot(mutation) {
+function spawn(mutation) {
 	if ($('.dot').length >= maxDots) return;
-	
-	var positions = [mainLeft + (mainWidth / 2), mainTop + (mainHeight / 2)];
 	
 	var dot = $('<div></div>')
 	.attr('class', 'dot')
 	.attr('name', mutation.name)
-	.attr('D', mutation.D)
-	.attr('R', mutation.R)
-	.attr('S', mutation.S)
-	.attr('B', mutation.B)
-	.attr('Dir', mutation.Dir)
-	.css({ left: positions[0], top: positions[1], background: mutation.background, border: mutation.border, outline: mutation.outline, borderRadius: mutation.borderRadius })
-	.appendTo('main');
+	.css({
+		left: mainWidth / 2,
+		top: mainHeight / 2,
+		background: mutation.innerColor,
+		border: randomNumber('int', 1, 6) + 'px solid ' + mutation.borderColor,
+		outline: randomNumber('int', 1, 5) + 'px solid ' + mutation.outlineColor,
+		borderRadius: mutation.borderRadius
+	}).appendTo('main');
 	
 	if (namesEnabled == true) {
 		dot.attr('seeNames', 'true');
 	}
 }
 
+function changeDecimalUpOrDown(value, max) {
+	if (probability(0.6)) {
+		var newValue = (probability(0.5)) ? ((value * 10) + 1) / 10 : ((value * 10) - 1) / 10;
+		newValue = (newValue <= 0.1) ? 0.1 : newValue;
+		newValue = (newValue >= max) ? max : newValue;
+		return newValue;
+	} else {
+		return value;
+	}
+}
+
 function mutate(previous) {
 	var newName = cuteName(6);
-	
-	var D = [(((previous.D * 10) - 1) / 10), (((previous.D * 10) + 1) / 10)][randomNumber('int', 0, 1)];
-	D = (D < 0.1) ? 0 : D;
-	D = (D > 1) ? 1 : D;
-	
-	var R = [(((previous.R * 10) - 1) / 10), (((previous.R * 10) + 1) / 10)][randomNumber('int', 0, 1)];
-	R = (R < 0.1) ? 0 : R;
-	R = (R > 1) ? 1 : R;
-	
-	var S = [previous.S - 1, previous.S + 1][randomNumber('int', 0, 1)];
-	S = (S < 1) ? 1 : S;
-	S = (S > 100) ? 100 : S;
-	
-	var newMutation = {
-		name: newName,
-		S: S,
-		D: D,
-		R: R,
-		Dir: previous.Dir + [randomNumber('int', 0, 3), randomNumber('int', 0, 3), randomNumber('int', 0, 3), randomNumber('int', 0, 3)].join(''),
-		border: randomNumber('int', 0, 6) + 'px solid ' + randomColor(),
-		outline: randomNumber('int', 0, 6) + 'px solid ' + randomColor(),
-		background: randomColor(),
-		borderRadius: [randomNumber('int', 0, 30), randomNumber('int', 0, 30), randomNumber('int', 0, 30), randomNumber('int', 0, 30)].join('px ') + 'px'
+	var speed = previous.speed;
+	var newSpeed = (randomNumber('int', 0, 1) == 0) ? ((speed * 10) - 1) / 10 : ((speed * 10) + 1) / 10;
+	newSpeed = (newSpeed <= 0.1) ? 0.1 : newSpeed;
+	newSpeed = (newSpeed >= 5) ? 5 : newSpeed;
+
+	var newMutation = { /* TODO: all the values below */
+		name: cuteName(6),
+		speed: newSpeed,
+		mutationRate: 0.3,
+		alive: true,
+		innerColor: randomColor(),
+		borderColor: randomColor(),
+		outlineColor: randomColor(),
+		borderRadius: randomBorderRadius(),
+		directions: previous.directions + getRandomDirections()
 	}
-	mutations.push(newMutation);
+	mutationsList.push(newMutation);
 	spawnDot(newMutation);
 	
-	console.log('Mutating from ' + previous.name + ' to ' + newMutation.name);
+	//console.log('Mutating from ' + previous.name + ' to ' + newMutation.name);
 }
 
 /* INTERVALS & TIMEOUTS */

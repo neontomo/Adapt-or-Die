@@ -58,6 +58,7 @@ main {
 	display: block;
 	padding-top: 18px;
 	margin-left: -15px;
+	opacity: 0.4;
 }
 
 @media (max-width: 700px)  {
