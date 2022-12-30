@@ -180,7 +180,7 @@ function mutate(previous) {
 		S: S,
 		D: D,
 		R: R,
-		Dir: [randomNumber('int', 0, 3), randomNumber('int', 0, 3), randomNumber('int', 0, 3), randomNumber('int', 0, 3)].join(''),
+		Dir: previous.Dir + [randomNumber('int', 0, 3), randomNumber('int', 0, 3), randomNumber('int', 0, 3), randomNumber('int', 0, 3)].join(''),
 		border: randomNumber('int', 0, 6) + 'px solid ' + randomColor(),
 		outline: randomNumber('int', 0, 6) + 'px solid ' + randomColor(),
 		background: randomColor(),
