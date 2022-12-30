@@ -183,7 +183,9 @@ function spawn(mutation) {
 		border: mutation.borderPx + 'px solid ' + mutation.borderColor,
 		outline: mutation.outlinePx + 'px solid ' + mutation.outlineColor,
 		borderRadius: mutation.borderRadius
-	}).appendTo('main');
+	}).appendTo('main').on('mouseover', function () {
+		updateInfo(this);
+	});
 	
 	if (namesEnabled == true) {
 		dot.attr('seeNames', 'true');
@@ -238,3 +240,16 @@ $('#collider').resizable({ handles: 'se' }).draggable({ containment: $('main') }
 for (var i = 0; i < 100; i++) {
 	mutate(mutationsList[0]);
 }
+
+function updateInfo(element) {
+	var dotName = $(element).attr('name');
+	var currentMutation = findMutation(dotName);
+	$('#info').show();
+	$('#info #dotName').html('<b>Name:</b> ' + dotName);
+	$('#info #dotSpeed').html('<b>Speed:</b> ' + currentMutation.speed);
+	$('#info #dotMutationRate').html('<b>Mutation rate:</b> ' + currentMutation.mutationRate);
+}
+
+$('#info').on('click', function () {
+	$(this).hide();
+});

@@ -26,12 +26,15 @@ main {
 	margin: 0 auto;
 }
 #collider {
-	background: var(--green);
-	opacity: 0.7;
+	opacity: 1;
 	position: fixed;
 	cursor: pointer;
 	width: 200px;
 	height: 200px;
+	border-radius: 6px;
+	border: 5px solid var(--green);
+	box-sizing: border-box;
+	background: #111;
 }
 #timer {
 	color: #fff;
@@ -66,4 +69,22 @@ main {
 	.dot {
 		outline: none !important;
 	}
+}
+
+#info {
+	display: none;
+	min-width: 100px;
+	color: #fff;
+	position: fixed;
+	left: 25px;
+	bottom: 25px;
+	background: #111;
+	padding: 10px 20px;
+	opacity: 0.6;
+	cursor: pointer;
+}
+#info span {
+	width: 100%;
+	display: block;
+	line-height: 25px;
 }
