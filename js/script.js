@@ -15,18 +15,12 @@ let mutationsList = [
 		name: 'god',
 		speed: 1,
 		mutationRate: 0.5,
-		innerColor: randomColor(),
-		borderColor: randomColor(),
-		borderPx: randomNumber('int', 1, 6),
-		outlineColor: randomColor(),
-		outlinePx: randomNumber('int', 1, 6),
-		borderRadius: randomBorderRadius(),
 		directions: '0123'
 	}
 ];
 
 function findMutation(name) {
-	return mutationsList.find(mutationsList => mutationsList.name === name);
+	return (mutationsList.find(mutationsList => mutationsList.name === name)) ? mutationsList.find(mutationsList => mutationsList.name === name) : false;
 }
 
 function updateInfo(element) {
@@ -35,6 +29,7 @@ function updateInfo(element) {
 	$('#info').show();
 	$('#info #dotName').html('<b>Name:</b> ' + dotName);
 	$('#info #dotSpeed').html('<b>Speed:</b> ' + currentMutation.speed);
+	$('#info #dotSize').html('<b>Size:</b> ' + currentMutation.size);
 	$('#info #dotMutationRate').html('<b>Mutation rate:</b> ' + currentMutation.mutationRate);
 }
 
@@ -123,6 +118,7 @@ function animateDots() {
 	
 	$('.dot').each(function () {
 		var currentMutation = findMutation($(this).attr('name'));
+		if (!currentMutation) return;
 		if (currentMutation.alive == true) {
 			var directions = currentMutation.directions;
 			var direction = directions[randomNumber('int', 0, directions.length - 1)];
@@ -199,6 +195,8 @@ function spawn(mutation) {
 	.css({
 		left: mainWidth / 2,
 		top: mainHeight / 2,
+		height: mutation.size + 'px',
+		width: mutation.size + 'px',
 		background: mutation.innerColor,
 		border: mutation.borderPx + 'px solid ' + mutation.borderColor,
 		outline: mutation.outlinePx + 'px solid ' + mutation.outlineColor,
@@ -215,11 +213,12 @@ function spawn(mutation) {
 function mutate(previous) {
 	if ($('.dot').length >= maxDots) return;
 	var newName = cuteName(6);
-	
+
 	mutationsList.push({
 		name: newName,
 		speed: changeDecimalUpOrDown(previous.speed, 5),
 		mutationRate: changeDecimalUpOrDown(previous.mutationRate, 1),
+		size: randomNumber('int', 10, 25),
 		innerColor: randomColor(),
 		borderColor: randomColor(),
 		borderPx: randomNumber('int', 0, 6),
