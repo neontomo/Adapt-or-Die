@@ -15,7 +15,6 @@ let mutationsList = [
 		name: 'god',
 		speed: 1,
 		mutationRate: 0.5,
-		alive: false,
 		innerColor: randomColor(),
 		borderColor: randomColor(),
 		borderPx: randomNumber('int', 1, 6),

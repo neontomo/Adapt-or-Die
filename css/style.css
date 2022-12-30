@@ -48,8 +48,8 @@ main {
 	width: 100px;
 }
 .dot {
-	height: 13px;
-	width: 13px;
+	height: 10px;
+	width: 10px;
 	background: #fff;
 	position: fixed;
 	box-sizing: border-box;
@@ -64,13 +64,6 @@ main {
 	opacity: 0.4;
 }
 
-@media (max-width: 700px)  {
-	/* Outline doesn't work on mobile unfortunately... */
-	.dot {
-		outline: none !important;
-	}
-}
-
 #info {
 	display: none;
 	min-width: 100px;
@@ -83,8 +76,16 @@ main {
 	opacity: 0.6;
 	cursor: pointer;
 }
+
 #info span {
 	width: 100%;
 	display: block;
 	line-height: 25px;
+}
+
+@media (max-width: 700px)  {
+	/* Outline doesn't work on mobile unfortunately... */
+	.dot {
+		outline: none !important;
+	}
 }
