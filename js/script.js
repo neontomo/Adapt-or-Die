@@ -30,6 +30,15 @@ function findMutation(name) {
 	return mutationsList.find(mutationsList => mutationsList.name === name);
 }
 
+function updateInfo(element) {
+	var dotName = $(element).attr('name');
+	var currentMutation = findMutation(dotName);
+	$('#info').show();
+	$('#info #dotName').html('<b>Name:</b> ' + dotName);
+	$('#info #dotSpeed').html('<b>Speed:</b> ' + currentMutation.speed);
+	$('#info #dotMutationRate').html('<b>Mutation rate:</b> ' + currentMutation.mutationRate);
+}
+
 /* RANDOM */
 
 function randomNumber(type, min, max, not) {
@@ -167,6 +176,17 @@ function updateTimer() {
 	}
 }
 
+function changeDecimalUpOrDown(value, max) {
+	if (probability(0.6)) {
+		var newValue = (probability(0.5)) ? ((value * 10) + 1) / 10 : ((value * 10) - 1) / 10;
+		newValue = (newValue <= 0.1) ? 0.1 : newValue;
+		newValue = (newValue >= max) ? max : newValue;
+		return newValue;
+	} else {
+		return value;
+	}
+}
+
 /* SPAWNING & MUTATING */
 
 function spawn(mutation) {
@@ -193,18 +213,8 @@ function spawn(mutation) {
 	}
 }
 
-function changeDecimalUpOrDown(value, max) {
-	if (probability(0.6)) {
-		var newValue = (probability(0.5)) ? ((value * 10) + 1) / 10 : ((value * 10) - 1) / 10;
-		newValue = (newValue <= 0.1) ? 0.1 : newValue;
-		newValue = (newValue >= max) ? max : newValue;
-		return newValue;
-	} else {
-		return value;
-	}
-}
-
 function mutate(previous) {
+	if ($('.dot').length >= maxDots) return;
 	var newName = cuteName(6);
 	
 	mutationsList.push({
@@ -238,19 +248,10 @@ setInterval(function () {
 $('#timer').html((activeTimer).toString().padStart(2, '0'));
 $('#collider').resizable({ handles: 'se' }).draggable({ containment: $('main') });
 
-for (var i = 0; i < 100; i++) {
-	mutate(mutationsList[0]);
-}
-
-function updateInfo(element) {
-	var dotName = $(element).attr('name');
-	var currentMutation = findMutation(dotName);
-	$('#info').show();
-	$('#info #dotName').html('<b>Name:</b> ' + dotName);
-	$('#info #dotSpeed').html('<b>Speed:</b> ' + currentMutation.speed);
-	$('#info #dotMutationRate').html('<b>Mutation rate:</b> ' + currentMutation.mutationRate);
-}
-
 $('#info').on('click', function () {
 	$(this).hide();
 });
+
+for (var i = 0; i < 100; i++) {
+	mutate(mutationsList[0]);
+}
