@@ -1,7 +1,7 @@
 /* CONFIG */
 
-windowWidth = $(window).width();
-windowHeight = $(window).height();
+/* TODO: add max amount of same mutation */
+
 mainWidth = $('main').outerWidth();
 mainHeight = $('main').outerHeight();
 gameRunning = true;
@@ -10,15 +10,17 @@ timer = 10;
 activeTimer = timer;
 namesEnabled = true;
 
-var mutationsList = [
+let mutationsList = [
 	{
 		name: 'god',
 		speed: 1,
-		mutationRate: 0.3,
-		alive: true,
+		mutationRate: 0.5,
+		alive: false,
 		innerColor: randomColor(),
 		borderColor: randomColor(),
+		borderPx: randomNumber('int', 1, 6),
 		outlineColor: randomColor(),
+		outlinePx: randomNumber('int', 1, 6),
 		borderRadius: randomBorderRadius(),
 		directions: '0123'
 	}
@@ -50,6 +52,15 @@ function randomColor() {
 	return `hsl(${h},${s}%,${l}%)`;
 }
 
+function randomBorderRadius() {
+	return [
+		randomNumber('int', 0, 30),
+		randomNumber('int', 0, 30),
+		randomNumber('int', 0, 30),
+		randomNumber('int', 0, 30)
+	].join('px ') + 'px';
+}
+
 function cuteName(length) {
 	var cuteName = [];
 	var c = 'bcdfghjklmnpqrstvwxyz'.split('');
@@ -61,31 +72,39 @@ function cuteName(length) {
 	return cuteName.join('');
 }
 
+function getRandomDirections() {
+	return [
+		randomNumber('int', 0, 3),
+		randomNumber('int', 0, 3),
+		randomNumber('int', 0, 3),
+		randomNumber('int', 0, 3)
+	].join('');
+}
+
 /* MOVING THE AI AROUND */
 
 function checkBounds(left, top) {
-	top = (top < mainTop + 5) ? mainTop + 5 : top; // top
-	top = (top > mainTop + mainHeight - 20) ? mainTop + mainHeight - 20 : top; // bottom
-	left = (left < mainLeft + 5) ? mainLeft + 5 : left; // left
-	left = (left > mainWidth - 20) ? mainWidth - 20 : left; // right
+	top = (top < 0) ? 0 : top; // top
+	top = (top > mainHeight) ? mainHeight : top; // bottom
+	left = (left < 0) ? 0 : left; // left
+	left = (left > mainWidth) ? mainWidth : left; // right
 	return [left, top];
 }
 
-function moveDot(dot, direction) {
-	direction = Number(direction);
-	var S = Number(dot.attr('S')) / 3;
+function moveDot(dot, direction, speed) {
+	var direction = Number(direction);
 	var position = dot.offset();
 	var left = position.left;
 	var top = position.top;
 	
 	if (direction == 0) {
-		var top = position.top - S;
+		var top = position.top - speed;
 	} else if (direction == 1) {
-		var left = position.left + S;
+		var left = position.left + speed;
 	} if (direction == 2) {
-		var top = position.top + S;
+		var top = position.top + speed;
 	} if (direction == 3) {
-		var left = position.left - S;
+		var left = position.left - speed;
 	}
 	var positions = checkBounds(left, top);
 	dot.css({ left: positions[0], top: positions[1] });
@@ -93,29 +112,25 @@ function moveDot(dot, direction) {
 
 function animateDots() {
 	if (gameRunning == false) return;
-	for (var i = 0; i < mutationsList.length; i++) {
-		if (mutationsList[i].alive == true) {
-			$('.dot[name="' + mutationsList[i].name + '"]').each(function () {
-				var directions = mutationsList[i].directions;
-				var direction = directions[randomNumber('int', 0, directions.length - 1)];
-				moveDot($(this), direction, mutationsList[i].speed);
-			});
+	
+	$('.dot').each(function () {
+		var currentMutation = findMutation($(this).attr('name'));
+		if (currentMutation.alive == true) {
+			var directions = currentMutation.directions;
+			var direction = directions[randomNumber('int', 0, directions.length - 1)];
+			moveDot($(this), direction, currentMutation.speed);
 		}
-	}
+	});
 }
 
 /* KILL & REWARD */
 
 function killDots() {
-	$('.dot').each(function () {		
+	$('.dot').each(function () {
 		var dotName = $(this).attr('name');
 		
 		if ($('#collider').collision($('.dot[name="' + dotName + '"]')).length == 0) { // extinct
-			for (var i = 0; i < mutationsList.length; i++) {
-				if (mutationsList[i].name == dotName) {
-					mutationsList[i].alive = false;
-				}
-			}
+			findMutation(dotName).alive = false;
 		}
 		if ($('#collider').collision(this).length == 0) { // dead
 			$(this).remove();
@@ -126,21 +141,14 @@ function killDots() {
 function rewardDots() {
 	$('.dot').css({ left: mainWidth / 2, top: mainHeight / 2 });
 	
-	for (var i = 0; i < mutationsList.length; i++) {
-		if (mutationsList[i].alive == true) {
-			$('.dot[name="' + mutationsList[i].name + '"]').each(function () {
-				var dotName = $(this).attr('name');
-				var mutationRate = mutationsList[i].mutationRate;
-				if (randomNumber('dec', mutationRate, 1) == mutationRate) {
-					// Chance of mutation
-					mutate(mutationsList[i]);
-				} else {
-					// Chance of carbon copy
-					spawnDot(mutationsList[i]);
-				}
-			});
+	$('.dot').each(function () {
+		var currentMutation = findMutation($(this).attr('name'));
+		if (probability(currentMutation.mutationRate)) {
+			mutate(currentMutation);
+		} else {
+			spawn(currentMutation);
 		}
-	}
+	});
 }
 
 function updateTimer() {
@@ -163,6 +171,8 @@ function updateTimer() {
 function spawn(mutation) {
 	if ($('.dot').length >= maxDots) return;
 	
+	mutation.alive = true;
+	
 	var dot = $('<div></div>')
 	.attr('class', 'dot')
 	.attr('name', mutation.name)
@@ -170,8 +180,8 @@ function spawn(mutation) {
 		left: mainWidth / 2,
 		top: mainHeight / 2,
 		background: mutation.innerColor,
-		border: randomNumber('int', 1, 6) + 'px solid ' + mutation.borderColor,
-		outline: randomNumber('int', 1, 5) + 'px solid ' + mutation.outlineColor,
+		border: mutation.borderPx + 'px solid ' + mutation.borderColor,
+		outline: mutation.outlinePx + 'px solid ' + mutation.outlineColor,
 		borderRadius: mutation.borderRadius
 	}).appendTo('main');
 	
@@ -193,33 +203,28 @@ function changeDecimalUpOrDown(value, max) {
 
 function mutate(previous) {
 	var newName = cuteName(6);
-	var speed = previous.speed;
-	var newSpeed = (randomNumber('int', 0, 1) == 0) ? ((speed * 10) - 1) / 10 : ((speed * 10) + 1) / 10;
-	newSpeed = (newSpeed <= 0.1) ? 0.1 : newSpeed;
-	newSpeed = (newSpeed >= 5) ? 5 : newSpeed;
-
-	var newMutation = { /* TODO: all the values below */
-		name: cuteName(6),
-		speed: newSpeed,
-		mutationRate: 0.3,
-		alive: true,
+	
+	mutationsList.push({
+		name: newName,
+		speed: changeDecimalUpOrDown(previous.speed, 5),
+		mutationRate: changeDecimalUpOrDown(previous.mutationRate, 1),
 		innerColor: randomColor(),
 		borderColor: randomColor(),
+		borderPx: randomNumber('int', 0, 6),
 		outlineColor: randomColor(),
+		outlinePx: randomNumber('int', 0, 6),
 		borderRadius: randomBorderRadius(),
 		directions: previous.directions + getRandomDirections()
-	}
-	mutationsList.push(newMutation);
-	spawnDot(newMutation);
+	});
 	
-	//console.log('Mutating from ' + previous.name + ' to ' + newMutation.name);
+	spawn(findMutation(newName));
 }
 
 /* INTERVALS & TIMEOUTS */
 
 setInterval(function () {
 	animateDots();
-}, 1 / 10);
+}, 1);
 
 setInterval(function () {
 	updateTimer();
@@ -231,5 +236,5 @@ $('#timer').html((activeTimer).toString().padStart(2, '0'));
 $('#collider').resizable({ handles: 'se' }).draggable({ containment: $('main') });
 
 for (var i = 0; i < 100; i++) {
-	mutate(mutations[0]);
+	mutate(mutationsList[0]);
 }
