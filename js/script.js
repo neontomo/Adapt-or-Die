@@ -88,9 +88,9 @@ function getRandomDirections() {
 
 function checkBounds(left, top) {
 	top = (top < 0) ? 0 : top; // top
-	top = (top > mainHeight) ? mainHeight : top; // bottom
+	top = (top > mainHeight - 35) ? mainHeight - 35: top; // bottom
 	left = (left < 0) ? 0 : left; // left
-	left = (left > mainWidth) ? mainWidth : left; // right
+	left = (left > mainWidth - 35) ? mainWidth - 35 : left; // right
 	return [left, top];
 }
 
@@ -216,7 +216,7 @@ function mutate(previous) {
 
 	mutationsList.push({
 		name: newName,
-		speed: changeDecimalUpOrDown(previous.speed, 5),
+		speed: changeDecimalUpOrDown(previous.speed, 10),
 		mutationRate: changeDecimalUpOrDown(previous.mutationRate, 1),
 		size: randomNumber('int', 10, 25),
 		innerColor: randomColor(),
