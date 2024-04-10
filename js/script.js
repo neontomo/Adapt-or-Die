@@ -298,6 +298,22 @@ function getTransformXY(element) {
 function killDots() {
   const safeZones = queryAll('.safe-zone')
 
+  safeZones.forEach((safeZone) => {
+    // too many dots in a single safe zone
+    const amountOfDotsInSafeZone = checkCollisionsReturnElements(
+      [safeZone],
+      queryAll('.dot')
+    )
+    if (amountOfDotsInSafeZone.length > 40) {
+      amountOfDotsInSafeZone.forEach((dot) => {
+        if (probability(0.5)) {
+          dot.remove()
+          dead++
+        }
+      })
+    }
+  })
+
   queryAll('.dot').forEach((dot) => {
     const dotName = dot.getAttribute('name')
 
@@ -319,6 +335,7 @@ function killDots() {
     }
 
     if (amountCollisionsOfType.length > 5) {
+      // 5+ of same species dies
       amountCollisionsOfType.forEach((dot, index) => {
         if (index > 5) {
           dot.remove()
@@ -328,6 +345,7 @@ function killDots() {
     }
 
     if (probability(0.1)) {
+      // 10% chance to die
       dot.remove()
       dead++
     }
