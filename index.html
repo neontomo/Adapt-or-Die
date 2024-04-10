@@ -1,30 +1,123 @@
-<!doctype html>
-<html>
-<head>
-	<title>Adapt or Die</title>
-	<meta name="description" content="AI">
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<link rel="stylesheet" href="https://neontomo.com/css/normalize.css" type="text/css">
-	<link rel="stylesheet" href="css/style.css" type="text/css">
-	<link rel="stylesheet" href="css/jquery-ui.min.css" type="text/css">
-	<link rel="icon" type="image/png" href="favicon.png" />
-</head>
-<body>
-	<main>
-		<div id="collider"></div>
-		<span id="timer"></span>
-		<div id="info">
-			<span id="dotName"></span>
-			<span id="dotSpeed"></span>
-			<span id="dotSize"></span>
-			<span id="dotMutationRate"></span>
-		</div>
-	</main>
-	<script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
-	<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-	<script src="js/jquery-collision.min.js"></script>
-	<script src="js/script.js"></script>
-</body>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Adapt or Die - A game where you must adapt to survive." />
+    <title>Adapt or Die</title>
+    <link
+      rel="stylesheet"
+      href="https://neontomo.com/css/reset.css" />
+    <link
+      rel="stylesheet"
+      href="css/style.css" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./favicons/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./favicons/favicon-32x32.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./favicons/favicon-16x16.png" />
+    <link
+      rel="manifest"
+      href="./favicons/site.webmanifest" />
+    <link
+      rel="mask-icon"
+      href="./favicons/safari-pinned-tab.svg"
+      color="#5bbad5" />
+    <meta
+      name="msapplication-TileColor"
+      content="#da532c" />
+    <meta
+      name="theme-color"
+      content="#ffffff" />
+  </head>
+  <body>
+    <main>
+      <div id="safe-zones"></div>
+      <div
+        id="stats"
+        class="faded">
+        <span id="timerValue"></span>
+        <div id="round">
+          Round:
+          <span id="roundValue"></span>
+        </div>
+        <div id="alive">
+          Alive:
+          <span id="aliveValue"></span>
+        </div>
+        <div id="dead">
+          Dead:
+          <span id="deadValue"></span>
+        </div>
+      </div>
+
+      <div
+        id="info"
+        class="hidden faded">
+        <p>Creature info:</p>
+        <div id="dotName">
+          <b>Name:</b>
+          <span id="dotNameValue"></span>
+        </div>
+        <div id="dotSpeed">
+          <b>Speed:</b>
+          <span id="dotSpeedValue"></span>
+        </div>
+        <div id="dotSize">
+          <b>Size:</b>
+          <span id="dotSizeValue"></span>
+        </div>
+        <div id="dotMutationRate">
+          <b>Mutation Rate:</b>
+          <span id="dotMutationRateValue"></span>
+        </div>
+        <div id="directions">
+          <b>Direction weights:</b>
+          <span id="directionsValue"></span>
+        </div>
+        <br />
+        <div class="buttons">
+          <button id="info-close">Close</button>
+        </div>
+      </div>
+
+      <div
+        id="about"
+        class="faded">
+        <h1>Adapt or Die</h1>
+        <p>
+          In this game, creatures evolve to survive. Click on them to view their
+          mutation details (desktop only). Their speed, size, and mutation rate
+          affect their survival.
+        </p>
+        <p>
+          Each round ends with creatures in the safe zone reproducing. You can
+          drag the safe zone to influence their evolution. For instance,
+          positioning it in the middle encourages creatures to move there.
+        </p>
+        <p>
+          A creature that reproduces will either create more of itself or a new
+          mutation of itself, based on its mutation probability.
+        </p>
+        <div class="buttons">
+          <button id="create-safe-zone">Create Safe Zone</button>
+          <button id="about-close">Close this window</button>
+        </div>
+      </div>
+    </main>
+    <script src="js/script.js"></script>
+  </body>
 </html>

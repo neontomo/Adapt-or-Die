@@ -1,91 +1,179 @@
 /* GENERAL ELEMENTS */
 
 :root {
-	--green: #0be881;
-	--red: #ff3f34;
+  --green: #0be881;
+  --red: #ff3f34;
 }
+
 * {
-	padding: 0;
-	margin: 0;
-	font-size: 14px;
-	font-family: arial;
-	user-select: none;
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
+  font-family: monospace;
+  user-select: none;
 }
-body, html {
-	height: 100%;
-	overflow: hidden;
+
+body,
+html {
+  height: 100%;
+  overflow: hidden;
 }
+
 main {
-	width: 100vw;
-	height: 100vh;
-	position: fixed;
-	top: 0;
-	left: 0;
-	box-sizing: border-box;
-	background: #000;
-	margin: 0 auto;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  background: #000;
+  margin: 0 auto;
 }
-#collider {
-	opacity: 1;
-	position: fixed;
-	cursor: pointer;
-	width: 200px;
-	height: 200px;
-	border-radius: 6px;
-	border: 5px solid var(--green);
-	box-sizing: border-box;
-	background: #111;
+
+.safe-zone {
+  opacity: 1;
+  position: fixed;
+  cursor: pointer;
+  border-radius: 20px;
+  border: 3px solid var(--green);
+  box-sizing: border-box;
+  background: #111;
+  resize: both;
+  overflow: hidden;
+  z-index: 1;
 }
-#timer {
-	color: #fff;
-	position: fixed;
-	right: 0;
-	top: 0;
-	z-index: 5;
-	padding: 30px;
-	font-size: 80px;
-	font-weight: bold;
-	width: 100px;
+
+.safe-zone::after {
+  content: 'SAFE ZONE';
+  color: var(--green);
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  letter-spacing: 2px;
 }
+
+#stats {
+  color: #fff;
+  position: fixed;
+  right: 30px;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: end;
+}
+
+#timerValue {
+  font-size: 80px;
+  font-weight: bold;
+}
+
 .dot {
-	height: 10px;
-	width: 10px;
-	background: #fff;
-	position: fixed;
-	box-sizing: border-box;
+  height: 10px;
+  width: 10px;
+  background: #fff;
+  position: fixed;
+  box-sizing: border-box;
+  z-index: 2;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
-.dot[seeNames="true"]::after {
-	content: attr(name);
-	font-size: 12px;
-	color: #fff;
-	display: block;
-	padding-top: 18px;
-	margin-left: -15px;
-	opacity: 0.4;
+
+.dot[seeNames='true']::after {
+  content: attr(name);
+  color: #fff;
+  display: block;
+  height: 100%;
+  width: 50px;
+  text-align: center;
+  margin-top: 30px;
+  margin-left: -19px;
+  opacity: 0.4;
 }
 
 #info {
-	display: none;
-	min-width: 100px;
-	color: #fff;
-	position: fixed;
-	left: 25px;
-	bottom: 25px;
-	background: #111;
-	padding: 10px 20px;
-	opacity: 0.6;
-	cursor: pointer;
+  min-width: 100px;
+  color: #fff;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  background: #111;
+  padding: 30px;
+  cursor: pointer;
+  max-width: 280px;
+  line-height: 23px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 0 20px 0 0;
 }
 
-#info span {
-	width: 100%;
-	display: block;
-	line-height: 25px;
+#info #directionsValue {
+  display: block;
 }
 
-@media (max-width: 700px)  {
-	/* Outline doesn't work on mobile unfortunately... */
-	.dot {
-		outline: none !important;
-	}
+#info div,
+#info div b,
+#info div span {
+}
+
+.hidden {
+  display: none !important;
+}
+
+#about {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  color: #fff;
+  background: #111;
+  max-width: 600px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 20px 0 0 0;
+}
+
+.faded {
+  opacity: 0.4;
+  transition: opacity 0.3s;
+}
+
+.faded:hover {
+  opacity: 1;
+}
+
+.buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: start;
+}
+
+button {
+  background: #eee;
+  color: #000;
+  padding: 5px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  border: 0;
+}
+
+@media (max-width: 700px) {
+  /* Outline doesn't work on mobile unfortunately... */
+  .dot {
+    outline: none !important;
+  }
+  #info {
+    display: none;
+  }
 }
